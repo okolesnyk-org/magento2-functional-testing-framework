@@ -1,3 +1,4 @@
+
 Magento Functional Testing Framework Changelog
 ================================================
 3.1.0
