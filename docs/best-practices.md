@@ -2,11 +2,49 @@
 
 Check out our best practices below to ensure you are getting the absolute most out of the Magento Functional Testing Framework.
 
+## Focus on reusability
+
+### Use existing Tests and resources
+
+Magento offers more than **3000** acceptance tests, **2500** [Action group]s, **750** Page declarations with more than **1500** Section definitions.
+It is very probable that behaviour you want to test already exists as a Test or Action Group.
+Instead of writing everything by yourself - use `extends` attribute to refer to existing element and customize it.
+
+**Reusable Resources**
+
+{%raw%}
+
+*  Tests (reusable with `<test extends="...">` argument)
+*  Action Group (reusable with including `<actionGroup ref="...">`, or extending `<actionGroup extends="...">`)
+*  Pages (reusable with reference `{{PageDefinition.url}}`)
+*  Sections (reusable with reference `{{SectionDefinition.elementDefinition}}`)
+*  Data Entities (reusable with reference `<createData entity="...">"` or extending `<entity extends="...">`)
+
+{%endraw%}
+
+<div class="bs-callout bs-callout-warning" markdown="1">
+
+Avoid using resources that are marked as **Deprecated**. Usually there is a replacement provided for a deprecated resource.
+
+</div>
+
+### Extract repetitive Actions
+
+Instead of writing a few of Tests that perform mostly the same actions, you should thing about [Action group] that is a container for repetitive Actions.
+If each run needs different data, use `<arguments>` to inject necessary information.
+
+We recommend to keep Action Groups having single responsibility, for example `AdminLoginActionGroup`, which expected outcome is being logged in as Administrator when [Action group] is executed.
+
+## Contribute
+
+Although the Magento Core team and Contributors join forces to cover most of the features with tests, it is impossible to have this done quickly.
+If you've covered Magento Core feature with Functional Tests - you are more than welcome to contribute.
+
 ## Action group
 
-1. [Action group] names should be sufficiently descriptive to inform a test writer of what the action group does and when it should be used.
- Add additional explanation in annotations if needed.
+1. [Action group] names should be sufficiently descriptive to inform a test writer of what the action group does and when it should be used. Add additional explanation in annotations if needed.
 2. Provide default values for the arguments that apply to your most common case scenarios.
+3. One `<actionGroup>` tag is allowed per action group XML file.
 
 ## `actionGroups` vs `extends`
 
@@ -68,7 +106,7 @@ Example: _StorefrontCreateCustomerTest.xml_.
 
 #### Action Group file name
 
-Format: {_Admin_ or _Storefront_}{Action Group Summary}ActionGroup.xml`, where Action Group Summary describes with a few words what we can expect from it.
+Format: {_Admin_ or _Storefront_}{Action Group Summary}ActionGroup.xml`, where Action Group Summary is a short description of what the action group does.
 
 Example: _AdminCreateStoreActionGroup.xml_ 
 
@@ -94,24 +132,25 @@ Use the _Foo.camelCase_ naming convention, which is similar to _Classes_ and _cl
 
 Use an upper case first letter for:
 
--  File names. Example: _StorefrontCreateCustomerTest.xml_
--  Test name attributes. Example: `<test name="TestAllTheThingsTest">`
--  Data entity names. Example: `<entity name="OutOfStockProduct">`
--  Page name. Example: `<page name="AdminLoginPage">`
--  Section name. Example: `<section name="AdminCategorySidebarActionSection">`
--  Action group name. Example: `<actionGroup name="LoginToAdminActionGroup">`
+*  File names. Example: _StorefrontCreateCustomerTest.xml_
+*  Test name attributes. Example: `<test name="TestAllTheThingsTest">`
+*  Data entity names. Example: `<entity name="OutOfStockProduct">`
+*  Page name. Example: `<page name="AdminLoginPage">`
+*  Section name. Example: `<section name="AdminCategorySidebarActionSection">`
+*  Action group name. Example: `<actionGroup name="LoginToAdminActionGroup">`
 
 #### Lower case
 
 Use a lower case first letter for:
 
--  Data keys. Example: `<data key="firstName">`
--  Element names. Examples: `<element name="confirmDeleteButton"/>`
--  Step keys. For example: `<click selector="..." stepKey="clickLogin"/>`
+*  Data keys. Example: `<data key="firstName">`
+*  Element names. Examples: `<element name="confirmDeleteButton"/>`
+*  Step keys. For example: `<click selector="..." stepKey="clickLogin"/>`
 
 ## Page object
 
-Use [parameterized selectors] for constructing a selector when test specific or runtime generated information is needed.
+1. One `<page>` tag is allowed per page XML file.
+2. Use [parameterized selectors] for constructing a selector when test-specific or runtime-generated information is needed.
 Do not use them for static elements.
 
 <span class="color:red">
@@ -145,10 +184,11 @@ Define these three elements and reference them by name in the tests.
 1. Keep your tests short and granular for target testing, easier reviews, and easier merge conflict resolution.
  It also helps you to identify the cause of test failure.
 1. Use comments to keep tests readable and maintainable:
-   -  Keep the inline `<!-- XML comments -->` and [`<comment>`] tags up to date.
+   *  Keep the inline `<!-- XML comments -->` and [`<comment>`] tags up to date.
      It helps to inform the reader of what you are testing and to yield a more descriptive Allure report.
-   -  Explain in comments unclear or tricky test steps.
+   *  Explain in comments unclear or tricky test steps.
 1. Refer to [sections] instead of writing selectors.
+1. One `<test>` tag is allowed per test XML file.
 
 ## Test step merging order
 
