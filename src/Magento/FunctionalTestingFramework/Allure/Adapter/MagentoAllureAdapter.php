@@ -8,6 +8,7 @@ namespace Magento\FunctionalTestingFramework\Allure\Adapter;
 use Codeception\Codecept;
 use Codeception\Test\Cest;
 use Codeception\Step\Comment;
+use Magento\FunctionalTestingFramework\Allure\AllureHelper;
 use Magento\FunctionalTestingFramework\Suite\Handlers\SuiteObjectHandler;
 use Magento\FunctionalTestingFramework\Test\Objects\ActionGroupObject;
 use Magento\FunctionalTestingFramework\Test\Objects\ActionObject;
@@ -41,6 +42,8 @@ use Codeception\Event\TestEvent;
 
 class MagentoAllureAdapter extends AllureCodeception
 {
+    private $doNotScreenshot = ['createData', 'updateData', 'deleteData', 'getData', 'magentoCLI'];
+
     const STEP_PASSED = "passed";
     /**
      * Test files cache.
@@ -186,6 +189,21 @@ class MagentoAllureAdapter extends AllureCodeception
 
         $this->emptyStep = false;
         $this->getLifecycle()->fire(new StepStartedEvent($stepName));
+        if (!in_array($stepEvent->getStep()->getAction(), $this->doNotScreenshot) && !($stepEvent->getStep() instanceof \Codeception\Step\Comment)) {
+            /** @var \Magento\FunctionalTestingFramework\Module\MagentoWebDriver $webDriver */
+            $webDriver = $this->getModule('\Magento\FunctionalTestingFramework\Module\MagentoWebDriver');
+
+            if (empty($name)) {
+                $name = uniqid(date("Y-m-d_H-i-s_"));
+            }
+            $debugDir = codecept_log_dir() . 'debug';
+            if (!is_dir($debugDir)) {
+                mkdir($debugDir, 0777);
+            }
+            $screenName = $debugDir . DIRECTORY_SEPARATOR . $name . '.png';
+            $webDriver->_saveScreenshot($screenName);
+            AllureHelper::addAttachmentToCurrentStep($screenName, '[BEFORE] ' . date("Y-m-d_H-i-s"));
+        }
     }
 
     /**
@@ -208,6 +226,21 @@ class MagentoAllureAdapter extends AllureCodeception
             $this->getLifecycle()->fire(new StepFailedEvent());
         }
 
+        if (!in_array($stepEvent->getStep()->getAction(), $this->doNotScreenshot) && !($stepEvent->getStep() instanceof \Codeception\Step\Comment)) {
+            /** @var \Magento\FunctionalTestingFramework\Module\MagentoWebDriver $webDriver */
+            $webDriver = $this->getModule('\Magento\FunctionalTestingFramework\Module\MagentoWebDriver');
+
+            if (empty($name)) {
+                $name = uniqid(date("Y-m-d_H-i-s_"));
+            }
+            $debugDir = codecept_log_dir() . 'debug';
+            if (!is_dir($debugDir)) {
+                mkdir($debugDir, 0777);
+            }
+            $screenName = $debugDir . DIRECTORY_SEPARATOR . $name . '.png';
+            $webDriver->_saveScreenshot($screenName);
+            AllureHelper::addAttachmentToCurrentStep($screenName, '[AFTER] ' . date("Y-m-d_H-i-s"));
+        }
         $this->getLifecycle()->fire(new StepFinishedEvent());
     }
 
