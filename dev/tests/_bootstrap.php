@@ -9,9 +9,11 @@ define('PROJECT_ROOT', dirname(dirname(__DIR__)));
 
 $vendorAutoloadPath = realpath(PROJECT_ROOT . '/vendor/autoload.php');
 $mftfTestCasePath = realpath(PROJECT_ROOT . '/dev/tests/util/MftfTestCase.php');
+$mftfStaticTestCasePath = realpath(PROJECT_ROOT . '/dev/tests/util/MftfStaticTestCase.php');
 
 require_once $vendorAutoloadPath;
 require_once $mftfTestCasePath;
+require_once $mftfStaticTestCasePath;
 
 // Set up AspectMock
 $kernel = \AspectMock\Kernel::getInstance();
@@ -54,8 +56,8 @@ foreach ($TEST_ENVS as $key => $value) {
     putenv("{$key}=${value}");
 }
 
-// Add our test module to the whitelist
-putenv('MODULE_WHITELIST=Magento_TestModule');
+// Add our test module to the allowlist
+putenv('MODULE_ALLOWLIST=Magento_TestModule');
 
 // Define our own set of paths for the tests
 defined('FW_BP') || define('FW_BP', PROJECT_ROOT);
